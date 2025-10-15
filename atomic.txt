@@ -1,0 +1,52 @@
+
+
+Compiler and CPU can reorder sub-operations for optimization purposes.
+
+example:
+Sub-operations of operation "increment" in correct order:
+1. read value from memory register
+2. calculate incrementing result
+3. write result into memory register
+
+Atomic garanties executing all these sub-operations as single "atomic" operation.
+("Atomic" prevents compiler and CPU reordering), so this prevents data inconsistency for multiple-threads-app.
+
+also:
+"atomic" is faster than "mutex".
+-- example with "atomic":
+var num atomic.Int32
+num.Add(5)  
+-- example with "mutex":
+int num
+mu.Lock()
+num = num + 5
+mu.Unlock()
+
+-- note:
+"atomic" pass by Pointer 
+
+-- atomic examples:
+
+var count atomic.Int32
+
+count.Add(5)           // Atomic add
+val := count.Load()    // Atomic read  
+count.Store(42)        // Atomic write
+count.Swap(100)        // Atomic swap
+
+// CompareAndSwap(<expected value>, <new value>)
+old := count.CompareAndSwap(100, 200) // atomic "compare and swap"
+// means: 
+//  compare: if current value of "count" var == 100
+//      то: swap (change value of "count" var from 100 to 200) 
+//      else: nothing doing
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,54 @@
+
+
+
+
+__________________________________________________________________________
+
+
+-- Slice:
+
+
+-- Create new slice from(based on) existing array
+Complexity:
+O(1)
+т.к. создается ("light-weight") pointer (int-овое поле) на конкретный item of (исходного) underlying array-я, и еще создаются int-овые поля: len,cap.
+
+-- Length/Capacity
+Complexity:
+O(1)
+т.к. this is stored in slice header
+
+-- Access by index (s[i])	
+Complexity:
+O(1)
+т.к. аналогично как в array-е
+
+-- Append(insert to end) item to slice
+Complexity:
+- if capacity еще осталась, то O(1)
+- else: O(n) т.к. resize underlying array (= allocate new larger array, copy all existing items from old array to new array)
+// p.s.
+on append:
+если current capacity уже "заполнена", то создается Новый underlying array (memory-address of new underlying-array = Новый) => т.е. slice.ptr меняется, поэтому рекомендуется всегда присваивать результат of append-a тому же slice-y в который append-ят.
+
+
+
+_________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

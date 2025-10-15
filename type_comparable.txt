@@ -1,0 +1,209 @@
+
+
+
+
+
+
+Comparable type implements interface "comparable":
+[T comparable]
+
+Comparable type operations:
+==, !=
+
+_________________________________________________________________
+
+
+-- Comparable Types
+
+1. Basic Types (all comparable):
+- bool,
+- Numeric types: 
+    all "int"/"uint" types,
+    all "float" types,
+    all "complex" types
+- string
+
+2. Pointer Types
+Pointers to any type (*T) are comparable if they point to the same type
+
+3. Channel Types
+Channel types are comparable
+
+4. Interface Types
+Interface types are comparable
+
+Two interface values are equal if they have identical dynamic types and equal dynamic values, or if both are nil
+
+5. Struct Types
+
+Struct is Comparable - If all their fields are comparable
+
+// example:
+
+type ComparableStruct struct {
+    Name string
+    Age  int
+}
+
+type NonComparableStruct struct {
+    Name     string
+    Children []string  // slice - not comparable
+}
+
+6. Array Types
+
+Array is Comparable - If their element type is comparable
+
+// example:
+
+var a1, a2 [3]int        // comparable
+var a3, a4 [2][]string   // NOT comparable (slice element)
+
+
+
+________________________________________________________________
+
+
+-- Non-Comparable Types
+
+
+1. Slice Types
+Slices are not comparable (except to nil)
+
+// example:
+
+s1 := []int{1, 2, 3}
+s2 := []int{1, 2, 3}
+// s1 == s2  // compile error!
+
+
+2. Map Types
+Maps are not comparable (except to nil)
+
+// example:
+
+m1 := map[string]int{"a": 1}
+m2 := map[string]int{"a": 1}
+// m1 == m2  // compile error!
+
+3. Function Types
+Functions are not comparable (except to nil)
+
+4. Structs containing non-comparable fields
+
+// example:
+
+type Person struct {
+    Name    string
+    Hobbies []string  // makes entire struct non-comparable
+}
+
+
+p.s.
+The key principle is: 
+a type is comparable if it doesn't contain any non-comparable types (slices, maps, functions) either directly or recursively through its fields.
+
+
+
+__________________________________________________________
+
+
+-- Comparison with nil
+
+All types can be compared with nil:
+
+// example:
+
+var s []int
+fmt.Println(s == nil)  // true
+
+var m map[string]int
+fmt.Println(m == nil)  // true
+
+var f func()
+fmt.Println(f == nil)  // true
+
+
+_____________________________________________________________
+
+
+-- Using reflect.DeepEqual (for non-comparable types)
+
+For complex types that aren't natively comparable, use reflect.DeepEqual:
+
+// example:
+
+import "reflect"
+
+s1 := []int{1, 2, 3}
+s2 := []int{1, 2, 3}
+fmt.Println(reflect.DeepEqual(s1, s2))  // true
+
+m1 := map[string]int{"a": 1}
+m2 := map[string]int{"a": 1}
+fmt.Println(reflect.DeepEqual(m1, m2))  // true
+
+
+_______________________________________________________________________
+
+
+-- Custom comparison methods
+
+For structs with non-comparable fields, implement custom comparison methods:
+
+// example:
+
+type Person struct {
+    Name    string
+    Hobbies []string
+}
+
+func (p Person) Equal(other Person) bool {
+
+    if p.Name != other.Name {
+        return false
+    }
+
+    if len(p.Hobbies) != len(other.Hobbies) {
+        return false
+    }
+
+    for i, h := range p.Hobbies {
+        if h != other.Hobbies[i] {
+            return false
+        }
+    }
+
+    return true
+}
+
+
+______________________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

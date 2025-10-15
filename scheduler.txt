@@ -1,0 +1,113 @@
+
+
+
+Scheduler = Планировщик
+
+______________________________________________________
+
+
+-- кооперативная многозадачность (cooperative multitasking):
+Gr сама "pause-ится".
+например: 
+current task/thread continues until it reaches a "best"(for this task) point(line of code) to allow switch cpu.
+At this moment: this task сама calls a special function: "yield()", тогда scheduler start execute next task.
+
+-- вытесняющая многозадачность (preemptive multitasking)
+cpu сам "вытесняет"(switch-ит) current running thread to next через некоторый time slice (интервал/квант времени).
+
+
+________________________________________________________
+
+
+кооперативный с элементами ВЫТЕСНЯЮЩЕГО:
+
+GRQ = Global Run Queue; GRQ - общая для всех P-ов; GRQ shared by Mutex;
+GRQ = <FIFO queue> + <1 slot LIFO>
+
+LRQ = Local Run Queue; P.LRQ; LRQ shared by Lock-Free Mutex;
+(max count of goroutines in LRQ = 256)
+
+P.GetNextGorutine by priority:
+1) if on 1/61 iter: check in GRQ // (p.s. через каждые 60 итераций)
+2) else: check in LRQ
+3) else: Work stealing (steal половину горутин from another P.LRQ)
+4) else: check in GRQ
+5) else: check in NetPool
+
+Краткие тезисы:
+// sysmon "засекает" время; sysmon на отдельном system thread-e.
+Network Syscall => NetPool(Gr); If Long => sysmon.Move(Gr, to:GRQ)
+File/Std[in/out] Syscall => Handoff(Gr,Thread); NewThread.For(P,LRQ);
+Long CalcTask(cpu-bound) => LRQ.End=Gr
+GRQ => Mutex; LRQ => Lock-Free Mutex;
+GRQ = <FIFO Queue> + <1 slot: LIFO>
+NextGr = 1/61 GRQ; LRQ; Steal(from LRQ); GRQ; NetPool;
+
+Подробнее:
+GoLangSchedulerLogic:
+if LRQ.CurGr.CurOp==syscall {
+    // sysmon "засекает время" выполнения
+    if short syscall (<10ms) { LRQ.SyncWait(); }
+    else if long syscall (>10ms) {
+        GR.Status="Waiting";
+
+        if syscall.Type="NetworkSyscall" { 
+            sysmon moves (only)Gr to NetPool(netpooler)
+            // P,LRQ,Thread "остаются" (not moves to NetPool)
+            
+            OnCompleteSyscall => {GR.Status="Runnable"}; 
+            if Gr.Status==Runnable & <Gr long stored in NetPool> { 
+                sysmon moves Gr from:NetPool to:GRQ 
+            };
+        }
+        else if syscall.Type="file/std[in/out]" {
+            Handoff: <curGr and curGr.Thread>; 
+            Create [New OsThread] for <cur.P, cur.LRQ>;
+        }
+    }
+}
+else if (not syscall, but:) LRQ.CurrentGr.ExecTime > MaxLongExecTime(10s) (example: бесконечный for-loop i++) {
+    sysmon "ВЫТЕСНЯЕТ" curGr в конец of LRQ.
+    // p.s. "типа так?":
+    // sysmon.invokeEvent(os.Signal(SUGURG), for:curGr.Thread);
+    // func(*Gr) HandleInternalSIGURG() { curPosition=LRQ.End; };
+}
+
+// OsThread executes on cpu
+// GR executes on OsThread
+
+runtime.GOMAXPROCS(n)
+// set count of P (это именно абстрактные=гошные P процессоры (не cpu, не threads))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

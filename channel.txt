@@ -1,0 +1,67 @@
+
+
+channel (канал) в GoLang:
+chan
+
+channel alloc-ейтится в heap-e
+
+source code:
+type hchan struct
+(p.s. h=Heap,chan=канал)
+// some fields of hchan:
+- buf буфер (p.s. buffer = circular queue),
+- qcount: количество элементов в буфере,
+- dataqsiz: размерность буфера,
+- closed uint32 (for atomic): флаг закрыт/открыт канал(buffer),
+- elemsize: alloc size for item,
+- elem type: type of item,
+- recvq: receive queue = очередь of reader-ов(goroutines which read from channel),
+- sendq: send queue = очередь of sender-ов(goroutines which push to channel),
+- recvx: current индекс in recvq,
+- sendx: current индекс in sendq,
+- lock: lockobj of this channel-instance.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

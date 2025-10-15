@@ -1,0 +1,367 @@
+
+
+
+
+--- Type System
+
+- Static Typing (статическая типизация):
+Types are checked at compile time, not runtime:
+example:
+var x int = 5
+x = "hello"  // Compile error: cannot use "hello" as int
+
+- Strong Typing (строгая типизация):
+No implicit type conversions (отсутствует неявное преобразование типов)
+example:
+var i int = 42
+var f float64 = i  // Error: cannot use i (type int) as float64
+var f float64 = float64(i)  // Correct: explicit(явное) conversion(преобразование)
+
+-- Built-in Types (встроенные типы)
+
+- Basic Types
+
+// Boolean
+var b bool = true
+
+// Numeric - Integer
+var i8 int8 = 127       // 8-bit(1-byte) signed
+var i16 int16 = 32767   // 16-bit(2-byte) signed
+var i32 int32 = 1       // 32-bit(4-byte) signed (rune is alias for int32)
+var i64 int64 = 1       // 64-bit(8-byte) signed
+var i int = 42          // Platform-dependent (32-bit(4-byte) or 64-bit(8-byte)) signed
+
+// Numeric - Unsigned Integer
+var u8 uint8 = 255      // 8-bit unsigned (byte is alias for uint8)
+var u16 uint16 = 65535  // 16-bit unsigned
+var u32 uint32 = 1      // 32-bit unsigned
+var u64 uint64 = 1      // 64-bit unsigned
+var u uint = 42         // Platform-dependent (32-bit(4-byte) or 64-bit(8-byte)) unsigned
+
+// Numeric - Floating Point
+var f32 float32 = 3.14 // 32-bit signed 
+var f64 float64 = 3.14 // 64-bit signed
+
+// Complex
+var c64 complex64 = 1 + 2i
+var c128 complex128 = complex(1, 2)
+
+// String
+var s string = "hello"
+
+// Error
+var err error = nil
+
+- Composite Types
+
+// Arrays - Fixed size
+example:
+var arr [3]int = [3]int{1, 2, 3}
+var autoArr = [...]int{1, 2, 3}  // Compiler determines size
+
+// Slices - Dynamic arrays
+example:
+var slice []int = []int{1, 2, 3}
+var emptySlice = make([]int, 5)  // length 5, capacity 5
+
+// Maps
+example:
+var m map[string]int = map[string]int{"a": 1, "b": 2}
+var emptyMap = make(map[string]int)
+
+// Structs
+example:
+type Person struct {
+    Name string
+    Age  int
+}
+var p Person = Person{Name: "Alice", Age: 30}
+
+// Pointers
+example:
+var x int = 10
+var ptr *int = &x
+
+- Interface Types
+// example:
+type Reader interface {
+    Read([]byte) (int, error)
+}
+type Writer interface {
+    Write([]byte) (int, error)
+}
+type ReadWriter interface { // Interface composition
+    Reader
+    Writer
+}
+// example: Empty Interface.
+var anything interface{} = 42
+anything = "hello"
+anything = []int{1, 2, 3}
+
+- Function Types
+// example:
+type MathOp func(int, int) int // Function as a type.
+var add MathOp = func(a, b int) int {
+    return a + b
+}
+result := add(5, 3)  // 8
+
+___________________________________________________________________________
+
+Zero Values
+
+Every type has a zero value:
+
+var i int       // 0
+var f float64   // 0.0
+var s string    // ""
+var b bool      // false
+var p *int      // nil
+var sl []int    // nil
+var m map[string]int  // nil
+
+
+_____________________________________________________________________________
+
+-- Type Inference (how Go infers type by value)
+
+examples:
+
+name := "hello"          // string
+count := 42             // int
+price := 19.99          // float64
+isReady := true         // bool
+
+fmt.Printf("name: %T\n", name)       // string
+fmt.Printf("count: %T\n", count)     // int
+fmt.Printf("price: %T\n", price)     // float64
+fmt.Printf("isReady: %T\n", isReady) // bool
+
+complexNum := 1 + 2i    // complex128
+d := 'x'       // rune (int32)
+e := byte(65)  // byte (uint8)
+x := 42     // int
+y := 3.14   // float64
+z := 1e10   // float64 (scientific notation)
+slice := []int{1, 2, 3}        // []int
+array := [3]int{1, 2, 3}       // [3]int
+dict := map[string]int{"a": 1} // map[string]int
+
+// x := nil  // ERROR: use of untyped nil
+
+-- p.s.
+Go prefer to infer to type "int" instead of "uint"/etc for integer literals.
+
+examples:
+
+// All integer literals default to int
+values := []interface{}{
+    0,          // int
+    42,         // int
+    -100,       // int
+    1_000_000,  // int (with underscores for readability)
+}
+
+// Different formats, same int type
+decimal := 10000     // int
+binary := 0b10011100010000  // int
+octal := 0o23420     // int  
+hex := 0x2710        // int
+
+fmt.Printf("decimal: %T\n", decimal) // int
+fmt.Printf("binary: %T\n", binary)   // int
+fmt.Printf("octal: %T\n", octal)     // int
+fmt.Printf("hex: %T\n", hex)         // int
+
+
+
+_______________________________________________________________________________
+
+Detect type of interface var:
+
+-- Type Assertion:
+// example:
+var val interface{} = "hello"
+str := val.(string)        // Panics if wrong type
+str, ok := val.(string)    // Safe: ok=false if wrong type
+
+-- Type switch
+// example:
+switch v := val.(type) {
+case string:
+    fmt.Println("string:", v)
+case int:
+    fmt.Println("int:", v)
+default:
+    fmt.Println("unknown type")
+}
+
+___________________________________________________________________________
+
+How to embed one type into another type
+
+p.s. No Inheritance in GoLang (Uses composition instead of classical inheritance).
+
+
+-- Type Embedding
+
+// example:
+
+type Person struct {
+    Name string
+    Age  int
+}
+
+type Employee struct {
+    Person  // Embedded type
+    Salary float64
+}
+
+emp := Employee{
+    Person: Person{Name: "Bob", Age: 25},
+    Salary: 50000,
+}
+
+fmt.Println(emp.Name)  // Access embedded field directly
+
+
+-- Implicit Interface Implementation
+
+// example:
+
+type Stringer interface {
+    String() string
+}
+
+type MyType int
+
+func (m MyType) String() string {
+    return fmt.Sprintf("MyType: %d", m)
+}
+// MyType implicitly implements interface "Stringer"
+
+
+-- Method Sets
+
+// example:
+
+type MyInt int
+
+// Value receiver
+func (m MyInt) ValueMethod() {}
+
+// Pointer receiver  
+func (m *MyInt) PointerMethod() {}
+
+var val MyInt = 5
+var ptr *MyInt = &val
+
+val.ValueMethod()    // OK
+val.PointerMethod()  // OK (automatically converted)
+ptr.ValueMethod()    // OK  
+ptr.PointerMethod()  // OK
+
+
+___________________________________________________________________________
+
+
+Type Conversion
+
+p.s. No Implicit Numeric Conversion
+
+// example:
+var i int = 42
+var f float64 = float64(i)  // Explicit conversion
+var u uint = uint(f)
+
+// example:
+var i int32 = 10
+var j int64 = 20
+// result := i + j  // Error: mismatched types
+
+
+_______________________________________________________________________________
+
+
+-- Type Alias
+
+
+type MyInt int
+type MyString string
+
+func main() {
+    var a, b MyInt = 5, 10
+    var s1, s2 MyString = "hello", "world"
+    
+    // These work because the underlying types are ordered
+    fmt.Println(cmp.Compare(a, b))     // -1 (a < b)
+    fmt.Println(cmp.Compare(s1, s2))   // -1 (s1 < s2)
+}
+
+
+____________________________________________________________
+
+
+-- p.s. architecture pattern:
+
+
+type Product struct {
+    Name  string
+    Price float64
+}
+
+// delegate:
+type CompareOption func(a, b Product) int
+
+// impl for delegate
+func ByName(a, b Product) int {
+    return cmp.Compare(a.Name, b.Name)
+}
+
+// impl for delegate
+func ByPrice(a, b Product) int {
+    return cmp.Compare(a.Price, b.Price)
+}
+
+// arg = many impl-s of delegate, 
+// return = imp for delegate (combines all arg iml-s)
+func By(options ...CompareOption) CompareOption {
+    // return "combined iml" for delegate
+    return func(a, b Product) int {
+        // range args:
+        for _, opt := range options {
+            if result := opt(a, b); result != 0 {
+                return result
+            }
+        }
+        return 0
+    }
+}
+
+func main() {
+    products := []Product{
+        {"Laptop", 999.99, 5},
+        {"Keyboard", 75.00, 8},
+    }
+    
+    compareFunc := By(ByName, ByPrice)
+    
+    compareFunc(products[i], products[j])
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

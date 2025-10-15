@@ -1,0 +1,44 @@
+
+-- Declare Map
+
+// Nil map (using var)
+var m1 map[string]int
+
+// Nil map (using make)
+m2 := make(map[string]int)
+
+// Nil map (using make with initial capacity)
+m3 := make(map[string]int, 10)
+
+// Empty map (using parenthesis)
+m4 := map[string]int{}
+
+// With initial values
+m5 := map[string]int{
+    "apple":  5, 
+    "banana": 3,
+    "orange": 2,
+}
+
+length := len(m)  // count of elements in map
+
+-- CRUD
+
+value, exists := m["key1"]   // Get (or check existence)
+m["key1"] = 10     // Insert
+m["key1"] = 20     // Update
+delete(m, "key1")  // Delete key-value pair
+clear(m)  // Remove all elements
+
+-- Iterate
+
+for key, value := range m {
+    fmt.Println(key, value)
+}
+
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+
+
+
+Ordered type implements interface "cmp.Ordered":
+[T cmp.Ordered]
+
+Ordered type operations:
+>, >=, <, <=
+
+
+_________________________________________________________________
+
+
+-- Ordered Types
+
+
+1. Basic Types:
+- Numeric types: 
+    all "int"/"uint" types,
+    all "float" types,
+- string
+
+
+___________________________________________________________________
+
+
+-- Non-Ordered Types 
+
+Complex numbers (complex64, complex128) - cannot be compared with <, >
+Booleans (bool) - cannot be compared with <, >
+Pointers - not directly ordered (though comparable with ==)
+Structs - unless all fields are ordered (but structs aren't automatically ordered)
+Slices, maps, channels, functions - not comparable with ordering operators
+Interfaces - not ordered
+
+
+___________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+

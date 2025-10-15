@@ -1,0 +1,44 @@
+
+
+GoLang determines whether to allocate a variable on the stack or the heap through a process called "escape analysis", which is performed by the compiler during compilation.
+
+-- Stack Allocation: 
+If the Go compiler can determine that a variable's lifetime is confined to the scope 
+of the function in which it's declared, meaning it will not be referenced after the 
+function returns, it will be allocated on the stack. This is efficient because stack 
+allocations are fast and automatically deallocated when the function exits.
+
+-- Heap Allocation: 
+If the compiler determines that a variable "escapes" the local scope of its 
+function, meaning it might be referenced after the function returns, it will be 
+allocated on the heap. 
+Examples of scenarios where a variable escapes include:  
+- Returning a pointer to a local variable from a function. 
+- Storing a local variable in a global variable or a data structure accessible 
+from outside the function. 
+- Passing a pointer to a local variable to another goroutine.
+
+-- p.s.
+Stack allocations are generally faster than heap allocations, as they involve 
+simple pointer manipulations. Heap allocations require more complex memory 
+management, including garbage collection. The Go compiler aims to allocate on 
+the stack whenever possible for performance reasons. 
+
+
+
+_________________________________________________________________________
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+

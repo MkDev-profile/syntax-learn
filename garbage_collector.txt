@@ -1,0 +1,19 @@
+
+
+
+
+
+algorithm "Tri-Color Mark-and-Sweep"
+
+p.s. GC Roots:
+(global vars; local vars(stack vars) inside Current-Executing funcs(all active goroutines); etc)
+
+
+
+
+
+
+
+
+
+

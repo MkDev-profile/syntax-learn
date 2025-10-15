@@ -1,0 +1,43 @@
+
+
+
+
+cd ./some-golang-module
+
+// create/initialize new module:
+go mod init example-module-name
+// p.s. created go.mod file, 
+// в go.mod файле прописывается версия of golang-a которая должна будет выполнять код (of этого created модуля):
+// example: 
+// go 1.25
+
+// refactor "import"-s:
+goimports -w .
+
+// refactor <отступы/переносы строк/т.д.>:
+go fmt ./...
+
+// download dependencies(imported packages):
+go mod tidy
+
+// compile go-files to executable-binary-file:
+go build .
+// p.s. (кто билдит?)=golang of версии(>= версии которая прописана в go.mod файле) => (эта версия golang-a должна быть установлена на машине).
+
+// (optional): clean cache
+go clean -modcache
+
+// launch/start/run program:
+# go mod run <dir of main.go>
+go run . 
+// OR:
+# go mod run <path to main.go>
+go mod run cmd/main.go
+
+
+
+
+
+
+
+
