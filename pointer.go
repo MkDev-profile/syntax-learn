@@ -86,7 +86,21 @@ func func_InputPointer(p2 *string) *string {
 	return p2
 }
 
+/*
 
+// output:
+
+0xc000026070 | k1 | v1
+0xc000060040 | p1 | 0xc000026070
+v1
+0xc000060050 | p2 | 0xc000026070
+0xc0000260a0 | k2 | v2
+0xc000060048 | p2_ret | 0xc0000260a0
+v2_update
+v2_update_latest
+v2_update_latest
+
+*/
 
 
 
