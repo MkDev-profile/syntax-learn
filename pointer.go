@@ -1,40 +1,90 @@
 package main
 
+import "fmt"
+
 func Main_pointer() {
-    example_main()
+	check_string_pointer()
 }
 
-// ------------------------------------------------------------------------------
-// Example:
-// pass pointer to function by value (by copy)
+func check_string_pointer() {
 
-func example_main() {
-    v := 5 // v: addr=0xA1 val=5 
-    p := &v // p: addr=0xA2 val=ref(to-> 0xA1)
-    
-    println(*p) // 5
-    changePointer(p) // pass <Copy of p>
-    println(*p) // <Output>
+	var k1 string = "v1"
+	// p.s. ram-memory (example)
+	// address: | key: | value:
+	// 0xA      | k1   | v1
+	fmt.Printf("%p | k1 | %s\n", &k1, k1)
+
+	p1 := &k1
+	// &k1 это memory address of k1 (hex-адрес в ram-памяти в котором хранится k1)
+	// p.s. ram-memory (example)
+	// address: | key:  | value:
+	// 0xB      | p1    | 0xA
+	fmt.Printf("%p | p1 | %v\n", &p1, p1)
+
+	// dereference of pointer: означает get value of "underlying" variable (получить значение of переменной на которую ссылается pointer)
+	var dv1 string = *p1
+	fmt.Println(dv1) // "v1"
+
+	var p2_ret *string = func_InputPointer(p1)
+	// assign result to p2_ret; p2_ret это новая переменная, у которой значение равно значению of result-а (т.е. значение копируется).
+	// p.s. ram-memory (example)
+	// address: | key:      | value:
+	// 0xE      | p2_ret    | 0xD
+	fmt.Printf("%p | p2_ret | %v\n", &p2_ret, p2_ret)
+
+	fmt.Println(*p2_ret) // "v2_update"
+
+	p1 = p2_ret
+	// присваивание(assignment) означает что копируется значение(value).
+	// p.s. ram-memory (example)
+	// address: | key:  | value:
+	// 0xB      | p1    | 0xD
+
+	*p1 = "v2_update_latest"
+	// p.s. ram-memory (example)
+	// address: | key: | value:
+	// 0xD      | k2   | v2_update_latest
+
+	fmt.Println(*p2_ret) // "v2_update_latest"
+
+	var pp1 **string = &p1
+	// p.s. ram-memory (example)
+	// address: | key:  | value:
+	// 0xF      | pp1    | 0xB
+
+	fmt.Println(**pp1) // "v2_update_latest"
 }
 
-func changePointer(p *int) { // input: <Copy of p> (=> copy of "pointer to v")
-    v := 3 // local v: addr=0xA3 val=3
-    //p = &v // changes <Copy of p>; p_copy=ref(to-> 0xA3); Output: 5, 5
-	*p = v // changes memory value where p refers; val(0xA1) = val(0xA3); Output: 5, 3
+func func_InputPointer(p2 *string) *string {
+	// p2 = "Copy(копия)" of input-a (т.е. в stack-e allocat-ится новая переменная (p2), у которой значение(value) такое-же как у input-переменной, т.е. "значение копируется")
+	// p.s. ram-memory (example)
+	// address: | key:  | value:
+	// 0xC      | p2    | 0xA
+	fmt.Printf("%p | p2 | %v\n", &p2, p2)
+
+	*p2 = "v1_update"
+	// p.s. ram-memory (example)
+	// address: | key: | value:
+	// 0xA      | k1   | v1_update
+
+	var k2 string = "v2"
+	// p.s. ram-memory (example)
+	// address: | key: | value:
+	// 0xD      | k2   | v2
+	fmt.Printf("%p | k2 | %s\n", &k2, k2)
+
+	p2 = &k2
+	// p.s. ram-memory (example)
+	// address: | key:  | value:
+	// 0xC      | p2    | 0xD
+
+	*p2 = "v2_update"
+	// p.s. ram-memory (example)
+	// address: | key: | value:
+	// 0xD      | k2   | v2_update
+
+	return p2
 }
-
-// ------------------------------------------------------------------------------
-
-// Pass by value - copies entire array
-func processArray(arr [1000]int) {
-}
-
-// Pass by pointer - avoids copy
-func processArrayPtr(arr *[1000]int) {
-}
-
-
-// --------------------------------------------------------------------------------
 
 
 

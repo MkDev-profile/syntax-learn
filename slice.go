@@ -8,7 +8,7 @@ import (
 )
 
 func Main_slice() {
-	
+	check_append_to_nil_slice()
 }
 
 // internal representation for type "slice" (p.s. golang source code: unsafeheader.go)
@@ -33,29 +33,57 @@ func printSlice(varName string, ptr *[]int) {
     // underlArrPtr := unsafe.SliceData(val) // equals to: &val[0].
 	// printf("%p",underlArrPtr) equals to: internalStruct.Data.
 
-    fmt.Printf("%s: Val = %s, Len = %d, Cap = %d, isNil = %t, ptr = %p, UnderlArrayPtr = %#x\n", 
-		varName, val, internalStruct.Len, internalStruct.Cap, 
-		val == nil, ptr, internalStruct.Data)
+    fmt.Printf("%s: ptr = %p, UnderlArrayPtr = %#x, Len = %d, Cap = %d, isNil = %t, Val = %v\n", 
+		varName, ptr, internalStruct.Data, 
+		internalStruct.Len, internalStruct.Cap, val == nil, val)
 }
 
-func slice_check_1() {
+// on append(to:curSlice, val:<valueToAppend>): 
+// if curSlice.cap недостаточно, то создается новый underlyingarray (в новой области памяти) с cap=oldCap*2, в него копируются значения из старого слайса, затем в него добавляется (в конец) <valueToAppend>.
+// p.s. т.е. чтобы не создавать(не аллоцировать) каждый раз новый underlyingarray => нужно сразу указывать требуемую cap при инициализации слайса.  
+
+func check_append_to_nil_slice() {
 	// only-declare (not initialize) slice
-	var s []int
+	var s []int // to "fix" alloc leaks: s := make([]int, 0, 9)
 	printSlice("s", &s)	
 	
-	s = append(s, 8) // append value "8"
-	// p.s. создался новый underlying array т.к. capacity было недостаточно
-	printSlice("s", &s) 
+	for i := 1; i < 10; i++ {
+		s = append(s, i) // append value "i"
+		printSlice("s", &s) 
+	}
 
 /*
-s: [], len = 0, cap = 0, isNil = true
-s: [8], len = 1, cap = 1, isNil = false
+
+// output:
+
+s: ptr = 0xc000094090, UnderlArrayPtr = 0x0, Len = 0, Cap = 0, isNil = true, Val = []
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc000086068, Len = 1, Cap = 1, isNil = false, Val = [1]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc0000860a0, Len = 2, Cap = 2, isNil = false, Val = [1 2]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc000092060, Len = 3, Cap = 4, isNil = false, Val = [1 2 3]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc000092060, Len = 4, Cap = 4, isNil = false, Val = [1 2 3 4]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc00009e080, Len = 5, Cap = 8, isNil = false, Val = [1 2 3 4 5]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc00009e080, Len = 6, Cap = 8, isNil = false, Val = [1 2 3 4 5 6]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc00009e080, Len = 7, Cap = 8, isNil = false, Val = [1 2 3 4 5 6 7]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc00009e080, Len = 8, Cap = 8, isNil = false, Val = [1 2 3 4 5 6 7 8]
+s: ptr = 0xc000094090, UnderlArrayPtr = 0xc0000a0100, Len = 9, Cap = 16, isNil = false, Val = [1 2 3 4 5 6 7 8 9]
+
 */
 
 }
 
+func check_slice_from_array() {
+	a := [5]int{ 0, 1, 2, 3, 4}
+	fmt.Printf("len(a1) = %d\n", len(a)) // 5
+	fmt.Printf("cap(a1) = %d\n", cap(a)) // 5
+
+	s5 := a[:]
+	printSlice("s5", &s5)
+
+	s6 := a[2:4] // from i=2(including) to i=4(not including)
+	printSlice("s6", &s6)
+}
+
 func slice_check_3() {
-	// only-declare (not initialize) slice
 	s := make([]int, 3, 4)
 	printSlice("s", &s)
 	
@@ -149,16 +177,7 @@ func slice_check_2() {
 	s4 := []int{4, 5, 6}
 	printSlice("s4", &s4)
 
-	// create slice From array
-	a1 := [5]int{0,1,2,3,4}
-	fmt.Printf("len(a1) = %d\n", len(a1)) // 5
-	fmt.Printf("cap(a1) = %d\n", cap(a1)) // 5
 
-	s5 := a1[:]
-	printSlice("s5", &s5)
-
-	s6 := a1[2:4] // = [i2;i4) = from i2 (including) to i4 (not including)
-	printSlice("s6", &s6)
 
 /*
 
