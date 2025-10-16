@@ -71,6 +71,48 @@ map[a:2 b:1]
 */
 
 
+/*
+
+-- Double-Deadlock example:
+
+var mu_1 sync.Mutex
+var mu_2 sync.Mutex
+
+func F1() {
+    mu_1.Lock()
+    fmt.Println("mu_1 locked by F1")
+
+    fmt.Println("try lock mu_2")
+    mu_2.Lock()
+
+    // code
+}
+
+func F2() {
+    mu_2.Lock()
+    fmt.Println("mu_2 locked by F2")
+
+    fmt.Println("try lock mu_1")
+    mu_1.Lock() // (blocked = waiting forever for mu_1)
+
+    // code
+}
+
+go F1()
+go F2()
+
+Deadlock: 
+example output:
+GR_1: mu_1 locked by F1
+GR_2: mu_2 locked by F2
+GR_1: try lock mu_2 // p.s. (blocked = waiting forever for mu_2)
+GR_2: try lock mu_1 // p.s. (blocked = waiting forever for mu_1)
+
+*/
+
+
+
+
 
 
 
