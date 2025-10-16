@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 	"unsafe"
 )
 
@@ -21,8 +22,8 @@ func printString(varName string, ptr *string) {
 
     // underlArrPtr := unsafe.StringData(val) // equals to: internalStruct.Data
 
-    fmt.Printf("%s: Val = %s, Len = %d, ptr = %p, UnderlArrayPtr = %#x\n", 
-		varName, val, internalStruct.Len, ptr, internalStruct.Data)
+    fmt.Printf("%s: Val = %s, Len = %d, UnderlArrayPtr = %#x\n", 
+		varName, val, internalStruct.Len, internalStruct.Data)
 }
 
 func string_check_1() {
@@ -72,21 +73,36 @@ func string_check_1() {
     s6 := string(b0) // (newly allocated) string
     printString("s6", &s6) 
 
+    var sb strings.Builder
+    sbStr := sb.String() // underlying array = nil
+    printString("sb", &sbStr)
+
+    sb.WriteByte(65)
+    sbStr = sb.String() // underlying array created
+    printString("sb", &sbStr)
+
+    sb.WriteByte(70)
+    sbStr = sb.String() // SAME underlying array
+    printString("sb", &sbStr)
+
 /*
 
 output:
 
 $ go run .
-s1: Val = Hello, Len = 5, ptr = 0xc00009c030, UnderlArrayPtr = 0x7ff6a5a15fcd
-s2: Val = Hello World, Len = 11, ptr = 0xc00009c060, UnderlArrayPtr = 0xc00008c090
-s1_sl_1: Val = Hello, Len = 5, ptr = 0xc00009c090, UnderlArrayPtr = 0x7ff6a5a15fcd
-s1_sl_2: Val = ello, Len = 4, ptr = 0xc00009c0c0, UnderlArrayPtr = 0x7ff6a5a15fce
-s4: Val = Hello, Len = 5, ptr = 0xc00009c0f0, UnderlArrayPtr = 0x7ff6a5a15fcd
+s1: Val = Hello, Len = 5, UnderlArrayPtr = 0x7ff64a856fcf
+s2: Val = Hello World, Len = 11, UnderlArrayPtr = 0xc00000a0e0
+s1_sl_1: Val = Hello, Len = 5, UnderlArrayPtr = 0x7ff64a856fcf
+s1_sl_2: Val = ello, Len = 4, UnderlArrayPtr = 0x7ff64a856fd0
+s4: Val = Hello, Len = 5, UnderlArrayPtr = 0x7ff64a856fcf
 s4[0] = 72
-b0 = 0xc00008c0c0, b1 = 0xc00008c0c1
-bytes0 = 0xc00008c0c8
-s5: Val = *ello, Len = 5, ptr = 0xc00009c120, UnderlArrayPtr = 0xc00008c0d0
-s6: Val = H, Len = 1, ptr = 0xc00009c150, UnderlArrayPtr = 0xc00008c0e0
+b0 = 0xc00000a108, b1 = 0xc00000a109
+bytes0 = 0xc00000a110
+s5: Val = *ello, Len = 5, UnderlArrayPtr = 0xc00000a118
+s6: Val = H, Len = 1, UnderlArrayPtr = 0xc00000a128
+sb: Val = , Len = 0, UnderlArrayPtr = 0x0
+sb: Val = A, Len = 1, UnderlArrayPtr = 0xc00000a138
+sb: Val = AF, Len = 2, UnderlArrayPtr = 0xc00000a138
 
 */
 
