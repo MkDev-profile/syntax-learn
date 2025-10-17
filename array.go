@@ -13,68 +13,41 @@ p.s.
 */
 
 func Main_array() {
-	// check_...
+	check_createArray()
 }
 
-// ----------------------------------------------------------------------
+func printArray(varName string, ptr *[5]int) {
+	val := *ptr
+
+    fmt.Printf("%s: ptr = %p, Len = %d, Cap = %d, Val = %v\n", 
+		varName, ptr, len(val), cap(val), val)
+}
 
 func check_createArray() {
-	// only-declare (not initialize) array
-	var a1 [3]int
+	var a1 [5]int
 	// значения автоматически инициализируются дефолтным значением для этого типа массива (например для типа int: default value = 0).
-	fmt.Printf("a1 = %v\n", a1)           // [0 0 0]
-	fmt.Printf("len(a1) = %d\n", len(a1)) // 3
-	fmt.Printf("cap(a1) = %d\n", cap(a1)) // 3
+	printArray("a1", &a1)
 
-	// declare and initialize (empty) array
-	a2 := [3]int{}
-	fmt.Printf("a2 = %v\n", a2)           // [0 0 0]
-	fmt.Printf("len(a2) = %d\n", len(a2)) // 3
-	fmt.Printf("cap(a2) = %d\n", cap(a2)) // 3
+	a2 := [5]int{}
+	printArray("a2", &a2)
 
-	// declare and initialize (not empty) array
-	a3 := [3]int{1, 2, 3}
-	fmt.Printf("a3 = %v\n", a3)           // [1 2 3]
-	fmt.Printf("len(a3) = %d\n", len(a3)) // 3
-	fmt.Printf("cap(a3) = %d\n", cap(a3)) // 3
+	a3 := [5]int{1, 2, 3, 4, 5}
+	printArray("a3", &a3)
 
-	// declare and initialize (not empty) array
-	a4 := [...]int{1, 2, 3}
-	fmt.Printf("a4 = %v\n", a4)           // [1 2 3]
-	fmt.Printf("len(a4) = %d\n", len(a4)) // 3
-	fmt.Printf("cap(a4) = %d\n", cap(a4)) // 3
-}
+	a4 := [...]int{1, 2, 3, 4, 5}
+	printArray("a4", &a4)
 
-// ----------------------------------------------------------------------
-
-func check_array() {
-    arr := [3]int{10, 20, 30}
+    fmt.Printf("ElementType: %T\n", a4[0])
+	fmt.Printf("ElementSizeInBytes: %d\n", unsafe.Sizeof(a4[0]))
+	fmt.Printf("ArraySizeInBytes: %d\n", unsafe.Sizeof(a4))
     
-    fmt.Printf("Array size: %d bytes\n", unsafe.Sizeof(arr))
-    fmt.Printf("Element size: %d bytes\n", unsafe.Sizeof(arr[0]))
-    
-    // Memory addresses are contiguous
-    for i := 0; i < len(arr); i++ {
-        fmt.Printf("arr[%d] address: %p\n", i, &arr[i])
+    // Memory addresses are contiguous():
+    for i := 0; i < len(a4); i++ {
+        fmt.Printf("arr[%d] address: %p\n", i, &a4[i])
     }
 
-/*
-
-Array size: 24 bytes // 3 elements * 8 bytes each (on 64-bit system)
-Element size: 8 bytes
-arr[0] address(hex): 0xc00009e030
-arr[1] address(hex): 0xc00009e038  // +8 bytes
-arr[2] address(hex): 0xc00009e040  // +8 bytes 
-// p.s. 16(dec.) = 10(hex.), p.s. 30(hex)+16(dec.)=30(hex)+10(hex)=40(hex)
-
-*/
-
-}
-
-// ----------------------------------------------------------------------
-
-func check_multiDimensionalArray() {
-    var matrix [2][3]int
+	// 2D array = матрица
+	var matrix [2][3]int // [rows][columns]
     
     // Stored as: 
 	// [row0-col0][row0-col1][row0-col2]
@@ -84,23 +57,35 @@ func check_multiDimensionalArray() {
             fmt.Printf("matrix[%d][%d] = %p\n", i, j, &matrix[i][j])
         }
     }
-
+}
 /*
 
-output:
+// output:
 
-matrix[0][0] = 0xc00000c330
-matrix[0][1] = 0xc00000c338
-matrix[0][2] = 0xc00000c340
-matrix[1][0] = 0xc00000c348
-matrix[1][1] = 0xc00000c350
-matrix[1][2] = 0xc00000c358
+a1: ptr = 0xc00000c300, Len = 5, Cap = 5, Val = [0 0 0 0 0]
+a2: ptr = 0xc00000c360, Len = 5, Cap = 5, Val = [0 0 0 0 0]
+a3: ptr = 0xc00000c3c0, Len = 5, Cap = 5, Val = [1 2 3 4 5]
+a4: ptr = 0xc00000c420, Len = 5, Cap = 5, Val = [1 2 3 4 5]
+ElementType: int
+ElementSizeInBytes: 8
+ArraySizeInBytes: 40
+arr[0] address: 0xc00000c420
+arr[1] address: 0xc00000c428
+arr[2] address: 0xc00000c430
+arr[3] address: 0xc00000c438
+arr[4] address: 0xc00000c440
+matrix[0][0] = 0xc00000c510
+matrix[0][1] = 0xc00000c518
+matrix[0][2] = 0xc00000c520
+matrix[1][0] = 0xc00000c528
+matrix[1][1] = 0xc00000c530
+matrix[1][2] = 0xc00000c538
 
 */
 
-}
 
-// ----------------------------------------------------------------------
+
+
 
 
 

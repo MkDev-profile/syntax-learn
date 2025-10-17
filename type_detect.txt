@@ -121,6 +121,16 @@ var p *int      // nil
 var sl []int    // nil
 var m map[string]int  // nil
 
+___________________________________________________________________________
+
+Type "nil":
+
+// internal source code:
+var nil Type	
+
+p.s. 
+for compare with nil: 
+Type must be a pointer / channel / func / interface / map / or slice.
 
 _____________________________________________________________________________
 
