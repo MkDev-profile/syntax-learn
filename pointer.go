@@ -1,9 +1,32 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"unsafe"
+)
 
 func Main_pointer() {
-	check_pointer()
+	check_unsafe_pointer()
+}
+
+func check_unsafe_pointer() {
+	// some variable = some value
+    var someVar int32 = 42
+    
+	// pointer = memory address of some variable
+	var ptr *int32 = &someVar
+
+	// convert concrete pointer type (*int32) -> to "generic" pointer type (unsafe.Pointer) 
+	// p.s. unsafe.Poiner это типа "общий/обобщенный/generic" тип of any ptr.
+    var uptr unsafe.Pointer = unsafe.Pointer(ptr) 
+
+	// convert "generic" pointer type (unsafe.Pointer) -> to concrete pointer type (*int32)
+	var concr_ptr *int32 = (*int32)(uptr)
+
+	// dereference ptr
+    value := *concr_ptr
+
+    fmt.Println("Dereferenced value:", value) // Output: 42
 }
 
 func check_pointer() {
