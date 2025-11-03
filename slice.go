@@ -305,9 +305,11 @@ func example_for_sort_func() {
         {"Charlie", 35},
     }
 
-    // Sort by age
+	// slices.SortFunc = "под капотом": гибридный алгоритм сортировки (quicksort/heapsort/etc)
     slices.SortFunc(people, func(a, b Person) int {
+		// sort by field "Age":
         return cmp.Compare(a.Age, b.Age)
+		// p.s. cmp.Compare(x, y) returns: x < y => -1, x > y => 1, x == y => 0
     })
     
     fmt.Println("Sorted by age:", people)
